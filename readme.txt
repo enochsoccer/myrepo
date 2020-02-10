@@ -1,6 +1,9 @@
 Introductory git commands:
 https://www.linux.com/tutorials/introduction-using-git/
 
+Intermediate:
+https://dont-be-afraid-to-commit.readthedocs.io/en/latest/git/commandlinegit.html
+
 Some basic commands:
 git add xxfilenamexx
 git checkout -b xxbranchnamexx
