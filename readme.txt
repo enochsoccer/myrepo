@@ -4,6 +4,9 @@ https://www.linux.com/tutorials/introduction-using-git/
 Intermediate:
 https://dont-be-afraid-to-commit.readthedocs.io/en/latest/git/commandlinegit.html
 
+How branches work:
+https://www.atlassian.com/git/tutorials/using-branches
+
 Some basic commands:
 git checkout -b <branchname>
 git branch  /  names what branch you are in
