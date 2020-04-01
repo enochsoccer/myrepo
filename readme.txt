@@ -5,7 +5,6 @@ Intermediate:
 https://dont-be-afraid-to-commit.readthedocs.io/en/latest/git/commandlinegit.html
 
 Some basic commands:
-git add <filename>
 git checkout -b <branchname>
 git branch | names what branch you are in
 git add <filename> | to stage a commit
