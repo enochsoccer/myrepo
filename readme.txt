@@ -4,12 +4,11 @@ https://www.linux.com/tutorials/introduction-using-git/
 Intermediate:
 https://dont-be-afraid-to-commit.readthedocs.io/en/latest/git/commandlinegit.html
 
-How branches work:
-https://www.atlassian.com/git/tutorials/using-branches
 
-Some basic commands:
+/----BASICS----/
+git clone <cloneURL>
 git checkout -b <branchname>
-git branch  /  names what branch you are in
+git branch  /  lists all branches
 git add <filename>  /  to stage a commit
 git commit -m "descriptive message"  /  to commit your changes 
 git push  /  pushes changes from master locally to master on GitHub
@@ -17,3 +16,12 @@ git push origin <branchname>  /  origin is where you cloned repo from; pushes co
 git pull origin <branchname>  /  pulls contents from GitHub to local repo
 git ls-files  /  lists files
 
+
+/----BRANCHES----/  
+how branches work: https://www.atlassian.com/git/tutorials/using-branches
+
+git branch  /  lists all branches
+git branch <newbranch>  /  creates new branch
+git branch -D <branch>  /  deletes branch
+git branch -a  /  lists remote branches
+git branch -m  <branch>  /  renames current branch to <branch>
