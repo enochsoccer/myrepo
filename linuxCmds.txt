@@ -1,0 +1,17 @@
+/----LINUX COMMANDS----/
+
+
+
+/----APPLICATIONS----/
+Install snap | sudo snap install appName
+Search snap (aka application) | snap find appName
+
+
+/----FILE MANAGER----/
+Open file on its application | xdg-open filenamehere.ext
+Open folder with file manager | nautilus foldername/
+
+
+/----TEXT EDITOR----/
+Go back to accidentally quit nano | fg
+Open .txt file with nano | nano filenamehere.txt

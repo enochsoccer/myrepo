@@ -4,6 +4,9 @@ https://www.linux.com/tutorials/introduction-using-git/
 Intermediate:
 https://dont-be-afraid-to-commit.readthedocs.io/en/latest/git/commandlinegit.html
 
+Username set:
+git config remote.origin.url "https://github.com/enochsoccer/myrepo.git"
+
 
 /----BASICS----/
 git clone <cloneURL>
