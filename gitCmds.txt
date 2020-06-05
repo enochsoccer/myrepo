@@ -7,6 +7,11 @@ https://dont-be-afraid-to-commit.readthedocs.io/en/latest/git/commandlinegit.htm
 Username set:
 git config remote.origin.url "https://github.com/enochsoccer/myrepo.git"
 
+https://guides.github.com/activities/hello-world/
+Opening (1) a pull request and merging (2) a pull request:
+(1) You're proposing your changes to be merged to their branch.
+(2) Merging the pull request's changes to your branch.
+
 
 /----BASICS----/
 git clone <cloneURL>
