@@ -11,6 +11,7 @@ Searching directory location of downloaded app | whereis <appName>
 Create folder in current directory | mkdir <folderName>
 Open file on its application | xdg-open <filenamehere.ext>
 Open folder with file manager | nautilus <foldername>
+Rename file in same directory | mv <currentname> <newname>
 
 
 /----TEXT EDITOR----/
