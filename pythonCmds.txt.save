@@ -1,0 +1,20 @@
+/----Copy----/ import copy
+Shallow copy | <somevariable> = copy.copy(<copiedvar>)
+
+
+/----Lists----/
+Appending to end of list | list.append()
+
+
+/----Numpy----/ import numpy as np
+Empty list | np.empty((rowsize,colsize))
+Flatten matrix | <numpymatr>.flatten(order='C') ... order='C' means flatten by row; 'F' by col
+
+
+/----String----/
+Counts number of occurrences of a substring in a given string | <string>.count()
+Replacing one character type in a string | <string>.replace(<whattoreplace>,<strReplacement>)
+Replacing (removing) multiple characters in a string to None | <string>.translate({ord(i): None for i in '<characters>'})
+Splitting elements by space | <string>.split()
+
+
