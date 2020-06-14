@@ -7,10 +7,18 @@ Install snap | sudo snap install <appName>
 Search snap (aka application) in order to download | snap find <appName>
 Searching directory location of downloaded app | whereis <appName>
 
+
+/---C++----/ How to compile and run a C++ program
+Compiling code | g++ -o <nameOfExecutable> <c++file.cpp>
+Creating a .cpp file | gedit <nameoffile.cpp>
+Running compiled code | ./<nameOfExecutable>
+
+
 /----FILE MANAGER----/
 Create folder in current directory | mkdir <folderName>
 Open file on its application | xdg-open <filenamehere.ext>
 Open folder with file manager | nautilus <foldername>
+Rename file in same directory | mv <currentname> <newname>
 
 
 /----TEXT EDITOR----/
