@@ -113,21 +113,20 @@ def checkyn(xn,yn):
         xn = swap(xn,0,i)
     return xn, yn
 
-def EinRegular(weights,phi,yn):
-    # Computes the in-sample training error for the regular form RBF model, given weight values (including bias value b)
-    #   and 'phi' matrix, which includes the xn and mu data inherently. 'phi' is expected to have a first column of 1's.
+def E_Regular(weights,phi,yn):
+    # Computes the in-sample or out-of-sample error for the regular form RBF model, given weight values
+    #   (including bias value b), the 'phi' matrix (expected to have a first column of 1's), and 'yn' labels.
     b = weights[0]
     w = weights[1:]
     N = len(phi[:,0])
-    bmat = np.repeat(b,N)
-    bmat = bmat.reshape(-1,1)  # converts to column vector
-    yest = np.sign(phi[:,1:]@w + bmat)  # estimated labels as a result of training; removed first column of 1's
-    Ein = np.sum(yest != yn)/len(yn)
-    return Ein
+    bmat = np.repeat(b,N).reshape(-1,1)  # converts to column vector
+    yest = np.sign(phi[:,1:]@w + bmat)  # estimated labels; removed first column of 1's
+    E = np.sum(yest != yn)/N
+    return E
 
-def EinKernel(svmMod,xn,yn,gamma):
-    # Computes the in-sample training error for the kernel form RBF model. Inputs are the SVM model 'svmMod',
-    #   input points 'xn', and training labels 'yn'.
+def E_Kernel(svmMod,xn,yn,gamma):
+    # Computes the in-sample or out-of-sample error for the kernel form RBF model. Inputs are the SVM model 'svmModel',
+    #   input points 'xn', labels 'yn', and the 'gamma' value.
     b = svmMod.intercept_
     N = len(yn)
     bmat = np.repeat(b,N).reshape(-1,1)  # converts to column vector
@@ -135,8 +134,8 @@ def EinKernel(svmMod,xn,yn,gamma):
     SVs = svmMod.support_vectors_
     phi = phiMat(xn,SVs,gamma)  # where originally 'mus' go in, I've replaced it with 'SVs'
     yest = np.sign(phi@coefs + bmat)  # estimated labels as a result of training
-    Ein = np.sum(yest != yn) / N
-    return Ein
+    E = np.sum(yest != yn) / N
+    return E
 
 def RBFregularform(K,xn,mus,yn,g,pl):
     # Computes the RBF model in the regular form.
@@ -147,9 +146,9 @@ def RBFregularform(K,xn,mus,yn,g,pl):
         bins = assignBins(xn, mus, K)  # assign a mu to each xn, i.e., bins 1 to K for each xn
         if emptyBins(bins, K):  # if there is an empty cluster/bin, then redo run
             # Generate new data and random center mu's
-            xn = generatexn(N)
-            yn = generateyn(xn)
-            xn, yn = checkyn(xn, yn)
+            #TESTING: xn = generatexn(N)
+            #TESTING: yn = generateyn(xn)
+            #TESTING: xn, yn = checkyn(xn, yn)
             mus = np.random.uniform(-1, 1, (K, 2))
         else:  # if none of the bins are empty, continue Lloyd's algorithm
             prevMus = copy.deepcopy(mus)  # memorize the previous centers
@@ -159,10 +158,11 @@ def RBFregularform(K,xn,mus,yn,g,pl):
                 plt.show()
                 break  # end of training
             if pl: plot(mus, color='orange')
+
     phi = phiMat(xn, mus, g)
     phi = np.concatenate((np.ones((N, 1)), phi), axis=1)  # adding column of 1's to compute for the bias term in the next line
     weights = (np.linalg.inv(phi.T @ phi)) @ phi.T @ yn  # pseudo-inverse; includes bias term b
-    return weights, phi
+    return weights, mus
 
 def RBFkernelform(xn,yn,g):
     # Computes the RBF model in the kernel form.
@@ -180,7 +180,7 @@ def statistics(vals,runs):
 
 
 # Which problem?
-problem = 13
+problem = 18
 
 if problem == 13:
     # RBF model - kernel form
@@ -193,29 +193,136 @@ if problem == 13:
         yn = generateyn(xn)
         xn, yn = checkyn(xn, yn)
         model = RBFkernelform(xn, yn, g)  # majority times, expecting Ein = 0 (i.e., linearly separable)
-        Ein = EinKernel(model, xn, yn, g)
+        Ein = E_Kernel(model, xn, yn, g)
         if Ein: count += 1  # i.e., if data is linearly inseparable
     print(count / runs)
 
-elif problem == 14:
-    # THIS IS WHERE YOU LEFT OFF. REMEMBER THE DETAIL ABOUT DISCARDING RUNS, MENTIONED IN PROBLEM 14.
+elif problem == 14 or problem == 15:
+    # Discard runs if:
+    #    (1) For RBF kernel: (Ein != 0) i.e., data is not separable in the Z-space by the RBF kernel w/ hard-margin SVM
+    #    (2) For RBF regular: if a cluster becomes empty
+    K = 12  # K-centers
+    N = 100  # number of training points
+    N_out = 100  # number of out-of-sample points
+    g = 1.5  # gamma
+    runs = 10000
+    count_invalid = 0  # number of invalid runs
+    E_outs_k = np.empty(runs)
+    E_outs_r = np.empty(runs)
+    pl = False  # plot?
 
+    for i in range(runs):
+        # Training both regular and kernel RBF forms
+        xn = generatexn(N)
+        yn = generateyn(xn)
+        xn, yn = checkyn(xn, yn)
+        # RBF regular form
+        mus = np.random.uniform(-1, 1, (K,2))  # initiate random center mu's
+        weights, mus = RBFregularform(K, xn, mus, yn, g, pl)
+        # RBF kernel form
+        model = RBFkernelform(xn, yn, g)  # majority times, expecting Ein = 0 (i.e., linearly separable)
+        Ein = E_Kernel(model, xn, yn, g)  # checking to see if linearly separable
+        if Ein > 0:
+            count_invalid += 1
+            continue  # returns to beginning of for-loop
 
-# RBF model - regular form
-K = 9  # K-centers
-N = 100  # number of training points
-g = 1.5  # gamma
-mus = np.random.uniform(-1, 1, (K,2))  # initiate random center mu's
-xn = generatexn(N)
-yn = generateyn(xn)
-xn, yn = checkyn(xn,yn)
-pl = False  # plot?
-weights, phi = RBFregularform(K,xn,mus,yn,g,pl)
-Ein = EinRegular(weights,phi,yn)
-print(Ein)
+        # Calculating out-of-sample errors
+        xn_out = generatexn(N_out)
+        yn_out = generateyn(xn_out)
+        E_outs_k[i] = E_Kernel(model, xn_out, yn_out, g)  # kernel form
+        phi_out = phiMat(xn_out, mus, g)
+        phi_out = np.concatenate((np.ones((N_out,1)), phi_out), axis=1)  # adding column of 1's to compute for the bias term in the next line
+        E_outs_r[i] = E_Regular(weights, phi_out, yn_out)  # regular form
 
+    # Comparing how often kernel form beats regular form
+    ratio = sum(E_outs_k < E_outs_r) / (runs - count_invalid)
+    print(count_invalid, "invalid counts out of", runs, "runs.")
+    print("Kernel form beats regular form %:", ratio*100)
 
+elif problem == 16:
+    K = 12  # K-centers
+    N = 100  # number of training points
+    N_out = 100  # number of out-of-sample points
+    g = 1.5  # gamma
+    runs = 7500
+    E_ins_r = np.empty(runs)
+    E_outs_r = np.empty(runs)
+    pl = False  # plot?
 
+    for i in range(runs):
+        # Training - RBF regular form
+        xn = generatexn(N)
+        yn = generateyn(xn)
+        xn, yn = checkyn(xn, yn)
+        mus = np.random.uniform(-1, 1, (K,2))  # initiate random center mu's
+        weights, mus = RBFregularform(K, xn, mus, yn, g, pl)
+        phi = phiMat(xn, mus, g)
+        phi = np.concatenate((np.ones((N,1)), phi), axis=1)  # adding column of 1's to compute for the bias term in t
+        E_ins_r[i] = E_Regular(weights, phi, yn)
 
+        # Calculating out-of-sample errors
+        xn_out = generatexn(N_out)
+        yn_out = generateyn(xn_out)
+        phi_out = phiMat(xn_out, mus, g)
+        phi_out = np.concatenate((np.ones((N_out,1)), phi_out), axis=1)  # adding column of 1's to compute for the bias term in the next line
+        E_outs_r[i] = E_Regular(weights, phi_out, yn_out)
 
+    print("Avg Ein =", np.mean(E_ins_r))
+    print("Avg Eout =", np.mean(E_outs_r))
 
+elif problem == 17:
+    K = 9  # K-centers
+    N = 100  # number of training points
+    N_out = 100  # number of out-of-sample points
+    gammas = [1.5, 2]  # gamma values
+    runs = 2000
+    E_vals_g = np.empty((len(gammas),2))  # first col = avg Ein; second col = avg Eout
+    E_ins_r = np.empty(runs)  # RBF regular form
+    E_outs_r = np.empty(runs)
+    pl = False  # plot?
+
+    for i_g, g in enumerate(gammas):
+
+        for i in range(runs):
+            # Training - RBF regular form
+            xn = generatexn(N)
+            yn = generateyn(xn)
+            xn, yn = checkyn(xn, yn)
+            mus = np.random.uniform(-1, 1, (K,2))  # initiate random center mu's
+            weights, mus = RBFregularform(K, xn, mus, yn, g, pl)
+            phi = phiMat(xn, mus, g)
+            phi = np.concatenate((np.ones((N,1)), phi), axis=1)  # adding column of 1's to compute for the bias term in t
+            E_ins_r[i] = E_Regular(weights, phi, yn)
+
+            # Calculating out-of-sample errors
+            xn_out = generatexn(N_out)
+            yn_out = generateyn(xn_out)
+            phi_out = phiMat(xn_out, mus, g)
+            phi_out = np.concatenate((np.ones((N_out,1)), phi_out), axis=1)  # adding column of 1's to compute for the bias term in the next line
+            E_outs_r[i] = E_Regular(weights, phi_out, yn_out)
+
+        E_vals_g[i_g,0] = np.average(E_ins_r)  # first col = avg Ein
+        E_vals_g[i_g,1] = np.average(E_outs_r)  # second col = avg Eout
+        print("Gamma:", g, "| E_in =", E_vals_g[i_g,0], ", E_out =", E_vals_g[i_g,1])
+
+elif problem == 18:
+    K = 9  # K-centers
+    N = 100  # number of training points
+    g = 1.5  # gamma
+    runs = 2500
+    E_ins_r = np.empty(runs)  # RBF regular form
+    pl = False  # plot?
+
+    for i in range(runs):
+        # Training - RBF regular form
+        xn = generatexn(N)
+        yn = generateyn(xn)
+        xn, yn = checkyn(xn, yn)
+        mus = np.random.uniform(-1, 1, (K,2))  # initiate random center mu's
+        weights, mus = RBFregularform(K, xn, mus, yn, g, pl)
+        phi = phiMat(xn, mus, g)
+        phi = np.concatenate((np.ones((N,1)), phi), axis=1)  # adding column of 1's to compute for the bias term in t
+        E_ins_r[i] = E_Regular(weights, phi, yn)
+
+    ratio = sum(E_ins_r == 0) / runs
+    print(ratio*100, "% of runs achieved E_in = 0")
