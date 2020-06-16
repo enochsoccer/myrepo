@@ -12,6 +12,9 @@ Opening (1) a pull request and merging (2) a pull request:
 (1) You're proposing your changes to be merged to their branch.
 (2) Merging the pull request's changes to your branch.
 
+Pulling from master to local branch:
+https://stackoverflow.com/questions/20101994/git-pull-from-master-into-the-development-branch/20103414
+
 
 /----BASICS----/
 git clone <cloneURL>
